@@ -17,11 +17,11 @@ var style = wb.createStyle({
   },
   numberFormat: '$#,##0.00; ($#,##0.00); -',
 });
-var Title;var makedRequest = 1;var ProductList = 0;
+var Title;var makedRequest = 1;var ProductList = 14;
 var productsListUrls = []; var productsList = []; var countOfProducts = 0;var productPackAttribs = []; var resultCountOfProducts = 1;
 var categoryPhotosOrig = [];var categoryPhotoList = [];
 
-var initURLS = ['http://plitka02.ru/keramicheskaya-plitka/nefrit-keramika','http://plitka02.ru/keramicheskaya-plitka/axima'];//'http://plitka02.ru/keramicheskaya-plitka/axima?page_col=2','http://plitka02.ru/keramicheskaya-plitka/axima?page_col=3','http://plitka02.ru/keramicheskaya-plitka/gracia-ceramica','http://plitka02.ru/keramicheskaya-plitka/gracia-ceramica?page_col=2','http://plitka02.ru/keramicheskaya-plitka/gracia-ceramica?page_col=3','http://plitka02.ru/keramicheskaya-plitka/gracia-ceramica?page_col=4','http://plitka02.ru/klinkernaya-plitka/paradyz','http://plitka02.ru/keramicheskaya-plitka/golden-tile','http://plitka02.ru/keramicheskaya-plitka/golden-tile?page_col=2','http://plitka02.ru/keramicheskaya-plitka/altacera','http://plitka02.ru/keramicheskaya-plitka/altacera?page_col=2','http://plitka02.ru/keramicheskiy-granit/estima','http://plitka02.ru/keramicheskiy-granit/estima?page_col=2','http://plitka02.ru/keramicheskiy-granit/coliseumgres'
+var initURLS = ['http://plitka02.ru/keramicheskiy-granit/italon?limit_col=16&page_col=2'];
 var countOfRequest = initURLS.length;
 var photoPath = 'http://plitka02.ru/image/cache/data/';
 
@@ -139,7 +139,7 @@ function getProductsAttribs(url){
 						var price = '';
 						for(var i = 0 ; i < $('.price_sklad_box>.row-fluid>.price').text().split('').length;i++){
 							if($('.price_sklad_box>.row-fluid>.price').text().split('')[i] != ' ') price += $('.price_sklad_box>.row-fluid>.price').text().split('')[i];
-						}			
+						}		
 						ws.cell(resultCountOfProducts, 1).number(resultCountOfProducts).style(style);//sku
 						ws.cell(resultCountOfProducts, 2).string($('h1').text()).style(style);
 						ws.cell(resultCountOfProducts, 3).string($('.attr>a').text()).style(style);
@@ -150,9 +150,9 @@ function getProductsAttribs(url){
 						ws.cell(resultCountOfProducts, 13).string($('.span6>.sizes>span:not([itemprop="width"]):not([itemprop="height"])').text()).style(style);
 						ws.cell(resultCountOfProducts, 14).string($('.span6>.sizes>span[itemprop="width"]').text()).style(style);
 						ws.cell(resultCountOfProducts, 15).string($('.span6>.sizes>span[itemprop="height"]').text()).style(style);
-						ws.cell(resultCountOfProducts, 16).string($('.span6>.attr').text().split('Поверхность:')[1]).style(style);
-						ws.cell(resultCountOfProducts, 17).string($('.span6>.attr').text().split('Назначение:')[1].split('\n')[0]).style(style);
-						ws.cell(resultCountOfProducts, 18).string($('.span6>.attr').text().split('Страна:')[1].split('\n')[0]).style(style)
+						if($('.span6>.attr').text().split('Поверхность:')[1] != undefined) ws.cell(resultCountOfProducts, 16).string($('.span6>.attr').text().split('Поверхность:')[1]).style(style);
+						if($('.span6>.attr').text().split('Назначение:')[1] != undefined) ws.cell(resultCountOfProducts, 17).string($('.span6>.attr').text().split('Назначение:')[1].split('\n')[0]).style(style);
+						if($('.span6>.attr').text().split('Страна:')[1] != undefined) ws.cell(resultCountOfProducts, 18).string($('.span6>.attr').text().split('Страна:')[1].split('\n')[0]).style(style)
 						ws.cell(resultCountOfProducts, 19).string(' '+productPackAttribs[gettedProducts-1]['countInPackM2']).style(style);
 						ws.cell(resultCountOfProducts, 20).string(' '+productPackAttribs[gettedProducts-1]['countInPack']).style(style);
 						ws.cell(resultCountOfProducts, 21).string(' '+productPackAttribs[gettedProducts-1]['AVGweightM2']).style(style);
@@ -214,7 +214,7 @@ function makeProductRequest($){
 			}
 			else{
 				console.log('Получено',ProductList,'списков товаров из',productsListUrls.length);
-				console.log('Получены все списки, получение товаров.');						
+				console.log('Получены все списки, получение товаров.');					
 				getProductsAttribs(productsList[0]).then(function(){
 					process.exit(-1);
 				});
@@ -242,8 +242,7 @@ function Initialise(url,path){
 				getResult('.product-block>div>a>img',$,i).then(function(response){		
 					makePath(path,response).then(function(res){	
 					console.log(res[0].url);					
-						request(encodeURI(res[0].url)).pipe(fs.createWriteStream('images/'+res[0].path+res[0].photoName)).on('close', function(){
-													
+						request(encodeURI(res[0].url)).pipe(fs.createWriteStream('images/'+res[0].path+res[0].photoName)).on('close', function(){													
 							productsListUrls[countOfCategories-1] = $('.product-block>.image>a')[countOfCategories-1].attribs.href;	
 							if(countOfCategories == $('.product-block').length){
 								console.log('Фотографии скачаны,категории получены. Категорий '+countOfCategories+'. Получаю списки..');								
@@ -290,5 +289,5 @@ ws.cell(1, 23).string('Category photo').style(style);
 console.log('Эксель подготовлен');	
 
 Initialise(initURLS[0],photoPath);
-app.listen(3000);
+app.listen(3001);
 module.exports.app = app;
